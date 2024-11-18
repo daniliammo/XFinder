@@ -1,0 +1,13 @@
+[package]
+name = "TryToFindX"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+string_calculator = "0.4.0"
+
+[profile.release]
+strip = "symbols"
+lto = "thin"
+panic = "abort"
+opt-level = 3
