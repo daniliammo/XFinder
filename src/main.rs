@@ -24,7 +24,9 @@ fn main() {
 
     let full_equation = &args[1];
 
-    let left_equation = split_equation(full_equation);
+    // equation.0 - left
+    // equation.1 - true
+    let equation = split_equation(full_equation);
 
     let min_x = f64::from_str(&args[2]).unwrap();
 
@@ -68,9 +70,8 @@ fn main() {
         tmp += step;
 
         answer = (tmp * (step * 1000000.0)).round() / (step * 1000000.0); // округляем до двух знаков после запятой
-
-        tmp_e.0 = left_equation.0.replace("x", format!("({})", answer.to_string()).as_str());
-        tmp_e.1 = left_equation.1.replace("x", format!("({})", answer.to_string()).as_str());
+        tmp_e.0 = equation.0.replace("x", format!("({})", answer.to_string()).as_str());
+        tmp_e.1 = equation.1.replace("x", format!("({})", answer.to_string()).as_str());
 
         left = eval_f64(tmp_e.0, 0.0).unwrap();
         right = eval_f64(tmp_e.1, 0.0).unwrap();
