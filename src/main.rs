@@ -43,9 +43,11 @@ fn main() {
     let try_find_near_answer = bool::from_str(&args[5]).unwrap();
 
     let silent = bool::from_str(&args[6]).unwrap();
-
-    println!("Буду подбирать неизвестную переменную в: {full_equation}, мин. x = {min_x}, макс. x = {max_x}, шаг = {step}");
     // end arguments
+
+
+    println!("Буду подбирать неизвестную переменную в: {full_equation}, \
+              мин. x = {min_x}, макс. x = {max_x}, шаг = {step}");
 
 
     let mut tmp: f64 = min_x;
