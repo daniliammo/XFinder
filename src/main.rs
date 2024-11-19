@@ -50,7 +50,7 @@ fn main() {
 
     let mut tmp: f64 = min_x;
 
-    let mut i = 0;
+    let mut i: i64 = 0;
 
     let mut answer: f64 = 0.0;
 
