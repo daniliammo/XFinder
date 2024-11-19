@@ -1,7 +1,8 @@
 use std::str::FromStr;
 use std::{env, f64};
 use string_calculator::eval_f64;
-
+use rust_decimal::Decimal;
+use rust_decimal::prelude::{ToPrimitive, Zero};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -28,13 +29,13 @@ fn main() {
     // equation.1 - true
     let equation = split_equation(full_equation);
 
-    let min_x = f64::from_str(&args[2]).unwrap();
+    let min_x = Decimal::from_str(&args[2]).unwrap();
 
-    let max_x = f64::from_str(&args[3]).unwrap();
+    let max_x = Decimal::from_str(&args[3]).unwrap();
 
-    let step = f64::from_str(&args[4]).unwrap();
+    let step = Decimal::from_str(&args[4]).unwrap();
 
-    if step <= 0.0 {
+    if step <= Decimal::try_from(0.0).unwrap() {
         println!("Точность = {step}. Точность не может быть равна 0 или меньше.");
         help();
         return
@@ -49,12 +50,9 @@ fn main() {
     println!("Буду подбирать неизвестную переменную в: {full_equation}, \
               мин. x = {min_x}, макс. x = {max_x}, шаг = {step}");
 
-
-    let mut tmp: f64 = min_x;
-
     let mut i: i64 = 0;
 
-    let mut answer: f64 = 0.0;
+    let mut answer: Decimal = Decimal::zero();
 
     let mut founded_answer: bool = false;
 
@@ -66,12 +64,12 @@ fn main() {
     let mut all_differences: Vec<f64> = Vec::new();
     let mut all_answers: Vec<f64> = Vec::new();
 
-    while tmp < max_x
+    while answer < max_x
     {
         i += 1;
-        tmp += step;
 
-        answer = (tmp * (step * 1000000.0)).round() / (step * 1000000.0); // округляем до двух знаков после запятой
+        answer += step; // округляем до двух знаков после запятой
+
         tmp_e.0 = equation.0.replace("x", format!("({})", answer.to_string()).as_str());
         tmp_e.1 = equation.1.replace("x", format!("({})", answer.to_string()).as_str());
 
@@ -85,7 +83,7 @@ fn main() {
 
         if try_find_near_answer {
             all_differences.push(left - right);
-            all_answers.push(answer);
+            all_answers.push(answer.to_f64().unwrap());
         }
 
         if !silent {
@@ -151,5 +149,6 @@ fn help() {
     println!("Использование: <уравнение> <минимальный X> <максимальный X> <точность>(больше 0) \
              <Искать ли ближайший ответ>(true или false) <silent>(true или false) \n\
              Внимание: поиск ближайшего ответа занимает оперативную память. \
-             Если silent = true, то программа работает быстрее так как вывод в stdout медленный и зависит от приложения терминала.");
+             Если silent = true, то программа работает быстрее так как \
+             вывод в stdout медленный и зависит от приложения терминала.");
 }
