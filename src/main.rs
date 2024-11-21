@@ -26,7 +26,7 @@ fn main() {
     let full_equation = &args[1];
 
     // equation.0 - left
-    // equation.1 - true
+    // equation.1 - right
     let equation = split_equation(full_equation);
 
     let min_x = Decimal::from_str(&args[2]).unwrap();
