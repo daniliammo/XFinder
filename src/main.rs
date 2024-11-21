@@ -52,7 +52,7 @@ fn main() {
 
     let mut i: i64 = 0;
 
-    let mut answer: Decimal = Decimal::zero();
+    let mut answer: Decimal = min_x;
 
     let mut founded_answer: bool = false;
 
