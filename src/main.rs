@@ -1,8 +1,9 @@
+use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::Decimal;
 use std::str::FromStr;
 use std::{env, f64};
+use regex::Regex;
 use string_calculator::eval_f64;
-use rust_decimal::Decimal;
-use rust_decimal::prelude::{ToPrimitive, Zero};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -29,9 +30,9 @@ fn main() {
     // equation.1 - right
     let equation = split_equation(full_equation);
 
-    let min_x = Decimal::from_str(&args[2]).unwrap();
+    let min_variable = Decimal::from_str(&args[2]).unwrap();
 
-    let max_x = Decimal::from_str(&args[3]).unwrap();
+    let max_variable = Decimal::from_str(&args[3]).unwrap();
 
     let step = Decimal::from_str(&args[4]).unwrap();
 
@@ -46,13 +47,17 @@ fn main() {
     let silent = bool::from_str(&args[6]).unwrap();
     // end arguments
 
+    let binding = find_variable(full_equation).unwrap();
+    let variable: char = binding.as_str().chars().next().unwrap();
 
-    println!("Буду подбирать неизвестную переменную в: {full_equation}, \
-              мин. x = {min_x}, макс. x = {max_x}, шаг = {step}");
+    println!("Буду подбирать {variable} в: {full_equation}, \
+              мин. {variable} = {min_variable}, макс. {variable} = {max_variable}, шаг = {step}");
 
-    let mut i: i64 = 0;
+    let mut i: u64 = 0;
 
-    let mut answer: Decimal = min_x;
+    let mut answer: Decimal = min_variable;
+
+    let mut answers: Vec<f64> = Vec::new();
 
     let mut founded_answer: bool = false;
 
@@ -64,14 +69,14 @@ fn main() {
     let mut all_differences: Vec<f64> = Vec::new();
     let mut all_answers: Vec<f64> = Vec::new();
 
-    while answer < max_x
+    while answer < max_variable
     {
         i += 1;
 
         answer += step; // округляем до двух знаков после запятой
 
-        tmp_e.0 = equation.0.replace("x", format!("({})", answer.to_string()).as_str());
-        tmp_e.1 = equation.1.replace("x", format!("({})", answer.to_string()).as_str());
+        tmp_e.0 = equation.0.replace(variable, format!("({})", answer.to_string()).as_str());
+        tmp_e.1 = equation.1.replace(variable, format!("({})", answer.to_string()).as_str());
 
         left = eval_f64(tmp_e.0, 0.0).unwrap();
         right = eval_f64(tmp_e.1, 0.0).unwrap();
@@ -107,6 +112,20 @@ fn main() {
             println!("Поиск ближайшего ответа отключен. Что бы его включить задайте пятый аргумент как true или 1.")
         }
     }
+}
+
+fn find_variable(equation: &str) -> Option<String> {
+    // Регулярное выражение для поиска переменных (букв) в уравнении
+    let re = Regex::new(r"[a-zA-Z]").unwrap();
+
+    // Найти переменную
+    for cap in re.captures_iter(equation) {
+        if let Some(var) = cap.get(0) {
+            return Some(var.as_str().to_string());
+        }
+    }
+
+    None
 }
 
 fn find_near_answer_and_difference(all_differences: &mut Vec<f64>, all_answers: &Vec<f64>) -> (f64, f64) {
