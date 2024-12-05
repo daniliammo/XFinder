@@ -8,11 +8,6 @@ use string_calculator::eval_f64;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args[1] == "-h" || args[1] == "--help" {
-        help();
-        return
-    }
-
     if args.len() < 7 {
         println!("Не хватает аргументов.");
         help();
@@ -22,6 +17,11 @@ fn main() {
     if args.len() > 8 {
         println!("Слишком много аргументов. Лишние аргументы проигнорированы.");
         help()
+    }
+
+    if args[1] == "-h" || args[1] == "--help" {
+        help();
+        return
     }
 
     let full_equation = &args[1];
